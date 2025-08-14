@@ -12,6 +12,8 @@ import BookingForm from './components/Booking/BookingForm';
 import BookingHistory from './components/Booking/BookingHistory';
 import Payment from './components/Booking/Payment';
 import PaymentSuccess from './components/PaymentSuccess';
+import Fail from './status/Fail';
+import Success from './status/Success';
 import './App.css';
 
 function App() {
@@ -33,6 +35,8 @@ function App() {
           <Route path="/book/:trainId" element={<PrivateRoute><BookingForm /></PrivateRoute>} />
           <Route path="/bookings" element={<PrivateRoute><BookingHistory /></PrivateRoute>} />
           <Route path="/payment/:bookingId" element={<PrivateRoute><Payment /></PrivateRoute>} />
+          <Route path="/success" element={<PrivateRoute> <Success /> </PrivateRoute> } />
+          <Route path="/fail" element={<PrivateRoute><Fail /></PrivateRoute>} />
         </Routes>
       </div>
     </div>

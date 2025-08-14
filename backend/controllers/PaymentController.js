@@ -3,6 +3,7 @@ const BookingModel = require('../models/Booking');
 const TrainModel = require('../models/Train'); 
 const sslCommerz = require('../utils/sslCommerz');
 
+
 const initPayment = async (req, res) => {
     try {
         const { bookingId } = req.body;
@@ -81,29 +82,24 @@ const validatePayment = async (req, res) => {
         const { bookingId } = req.params;
         const val_id = req.body.val_id || req.query.val_id;
         const status = req.body.status || req.query.status;
+        const tran_id = req.body.tran_id || req.query.tran_id;
 
         if (!val_id) {
-            return res.status(400).json({
-                success: false,
-                message: "val_id is required"
-            });
+            return res.redirect(`${process.env.FRONTEND_URL}/fail?tran_id=${tran_id}&error=validation`);
         }
 
         // Skip validation in development
         if (process.env.NODE_ENV !== 'development') {
             const validationResponse = await sslCommerz.validate({ val_id });
             if (validationResponse.status !== 'VALID') {
-                return res.status(400).json({
-                    success: false,
-                    message: "SSLCommerz validation failed"
-                });
+                return res.redirect(`${process.env.FRONTEND_URL}/fail?tran_id=${tran_id}&error=validation`);
             }
         }
 
         // Update payment record
         const payment = await PaymentModel.findOneAndUpdate(
-            { transactionId: req.body.tran_id || "SANDBOX_TEST_ID" },
-            { status: 'success', paymentDetails: req.body },
+            { transactionId: tran_id || "SANDBOX_TEST_ID" },
+            { status: 'success', paymentDetails: req.body || req.query },
             { new: true }
         );
 
@@ -122,22 +118,30 @@ const validatePayment = async (req, res) => {
             );
         }
 
-        return res.status(200).json({
-            success: true,
-            message: "Payment validated successfully"
-        });
+        return res.redirect(`${process.env.FRONTEND_URL}/success?tran_id=${tran_id}`);
 
     } catch (err) {
         console.error("Payment validation error:", err);
-        res.status(500).json({
-            success: false,
-            message: err.message
-        });
+        return res.redirect(`${process.env.FRONTEND_URL}/fail?error=processing`);
     }
 };
 
 
+const payment = async (req,res)=>{
+    try{
+        const payment_history = await PaymentModel.findOne({transactionId: req.params.transactionId});
+        if(!payment_history){
+            return res.status(404).json({error:'payment history not  found'});
+        }
+        res.json(payment_history);
+    } catch{
+        res.status(500).json({ error: err.message });
+    }
+}
+
+
 module.exports = {
     initPayment,
-    validatePayment
+    validatePayment,
+    payment
 };
