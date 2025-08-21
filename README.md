@@ -139,15 +139,8 @@ cd ../frontend && npm test
 ```
 
 ## Deployment
+Backend url
+https://shuttlesync-railway-app.onrender.com
 
-### Backend Deployment
-1. Set up a Node.js hosting environment (e.g., Heroku, AWS, DigitalOcean)
-2. Configure production MongoDB connection
-3. Update environment variables
-
-### Frontend Deployment
-1. Build production version:
-```bash
-cd frontend && npm run build
-```
-2. Deploy to static hosting (e.g., Netlify, Vercel, AWS S3)
+Frontend url
+https://shuttlesync-railway-app-1.onrender.com
